@@ -1,0 +1,59 @@
+# --- MediaWiki directories ---
+cache/
+docs/
+extensions/*
+!extensions/Scribunto
+extensions/Scribunto/*
+!extensions/Scribunto/modules
+images/
+includes/
+languages/
+logs/
+maintenance/
+mw-config/
+resources/
+skins/
+sql/
+tests/
+vendor/
+
+# --- Core MediaWiki files ---
+api.php
+autoload.php
+bundlesize.config.json
+CODE_OF_CONDUCT.md
+composer.json
+composer.local.json-sample
+composer.lock
+COPYING
+CREDITS
+FAQ
+HISTORY
+img_auth.php
+index.php
+INSTALL
+jsdoc.json
+load.php
+opensearch_desc.php
+RELEASE-NOTES-1.44
+rest.php
+SECURITY
+thumb_handler.php
+thumb.php
+UPGRADE
+
+# --- Scribunto module files ---
+extensions/Scribunto/modules/.eslintrc.json
+extensions/Scribunto/modules/ext.scribunto.edit.js
+extensions/Scribunto/modules/ext.scribunto.edit.less
+extensions/Scribunto/modules/ext.scribunto.errors.css
+extensions/Scribunto/modules/ext.scribunto.errors.js
+extensions/Scribunto/modules/ext.scribunto.logs.css
+
+# --- File types ---
+*.sqlite
+*.log
+
+# --- Other files ---
+csrftoken.txt
+apilogin.json

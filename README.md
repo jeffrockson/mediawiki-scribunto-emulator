@@ -1,10 +1,16 @@
-MediaWiki Runner for local module development in VSCode
+# MediaWiki Runner for local module development in VSCode
 
 Clone this package into your local installation of MediaWiki w/ Scribunto, and you can debug your lua modules locally, using the same exact code as in your deployed modules, like "Module:" namespace. The main file (mw_runner.lua) looks for this namespace and replaces it with your paths as set in your launch environment variables.
 
-This performs no remote/server requests; all content must be on your local filesystem.
+This performs NO remote/server requests; all content must be on your local filesystem. It currently does not make any API calls to your local MediaWiki database either, although I'd like to in the future so this can support expanding templates.
 
-At this time, your MW/php server does not need to be running for this to work, but if it is, and you save your module files, and refresh your browser, changes should be reflected immediately, because they are accessing the same files.
+To access any files through the mw library (not an API call), the Mediawiki server much be running. If no content files are required, editing can happen offline. When you save your module files, and refresh your browser, changes should be reflected immediately, because your code editor and the MediaWiki server are accessing the same files.
+
+Examples of things this can do:
+* load any data files (.csv, .json, or a lua module) from the database through mw.title.new, like Module:MyModule/Data.csv
+* import other modules via the same code as on your production server, require("Module:MyModule")
+* return html with the mw.html library
+* step through Lua code and examine variables for debugging
 
 
 ## 21 Oct 2025
@@ -19,9 +25,9 @@ The .vscode/settings.json Removes all superfluous folders and files from the VSC
 .cursorignore does not have the token file
 .gitignore does not have LocalSettings or token file
 
-be sure to have launch.json env set both MW_PATH_ROOT and LUA_LIB_PATH_ROOT that identify your local paths.
+Be sure to have launch.json env set all three MW_PATH and LUA_LIB_PATH and MODULE_PATH that identify your local paths.
 
-For using the API, you need to store your token in plain text in csrftoken.txt
+Note for later if I ever get to using the API, you need to store your token in plain text in csrftoken.txt
 You can find your token by: http://localhost:4000/api.php?action=query&meta=tokens&type=csrf&format=json
 
 In your LocalSettings.php, make sure you add this so template saves in VSCode can be automatically pushed to the local database for testing:

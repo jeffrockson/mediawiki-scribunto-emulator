@@ -13,7 +13,7 @@
         "MW_PATH": "C:/tools/mediawiki-1.44.2",
         "LUA_LIB_PATH": "C:/tools/mediawiki-1.44.2/extensions/Scribunto/includes/Engines/LuaCommon/lualib",
         "MODULE_PATH": "C:/tools/mediawiki-1.44.2/extensions/Scribunto/modules",
-        "TARGET": "${file}"
+        "TARGET_FILE": "${file}"
       }
     }
   ]

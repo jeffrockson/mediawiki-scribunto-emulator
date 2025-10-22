@@ -1,5 +1,8 @@
 -- mw_runner.lua
 -- Local Scribunto-like environment bootstrap for VSCode debugging
+-- In global container
+_G.mw_runner = {}
+local mw_runner = _G.mw_runner
 
 -- Read environment variables from launch.json
 local mw_path = os.getenv("MW_PATH")
@@ -29,14 +32,6 @@ mw.title = require("mw.title")
 mw.ustring = require("mw.ustring")
 mw.text = require("mw.text")
 mw.html = require("mw.html")
-
--- Minimal stub for getCurrentFrame
-mw.getCurrentFrame = function()
-    return {
-        expandTemplate = function() return "" end,
-        args = {}
-    }
-end
 
 -- Override require() to simulate MediaWiki’s Module:Name resolution
 local real_require = require
@@ -97,12 +92,19 @@ mw.text.jsonDecode = function(str)
     return json.decode(str)
 end
 
+-- Load simulated frame arguments
+mw.getCurrentFrame = function() return { args = {}, expandTemplate = function() return "" end } end
+function mw_runner.setFrame(args)
+    local frame = { args = args or {}, expandTemplate = function() return "" end }
+    mw.getCurrentFrame = function() return frame end
+    return frame
+end
+
 -- Load the target module passed from launch.json (the current file)
-local target = os.getenv("TARGET")
+local target = os.getenv("TARGET_FILE")
 if not target or target == "" then
-    print("Usage: open a Lua file and press F5 to debug it.")
+    print("Usage: open a Module file or test script and press F5 to debug it.")
     os.exit(1)
 end
 
-print("[mw_runner] Debugging module:", target)
 dofile(target)

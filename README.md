@@ -14,6 +14,14 @@ Examples of things this can do:
 
 
 ## 21 Oct 2025
+Now emulates setting the frame for mw.getCurrentFrame calls to work inside modules.
+
+Can also serve both direct-debugging of modules exactly as-is on your live MW production site (but without invoking their functions) and test script files. An example script file is provided that requires a module and calls its main function just like a template call from a page on a wiki site.
+
+Note that you do not need to (and cannot) require("mw_runner") in the test script or it will cause an infinite loop of invoking itself.
+
+
+## 21 Oct 2025
 I skipped writing a template auto-updater that would publish updates to template (or content I suppose) files via your MW localhost's API.
 
 The mw_runner now wraps title.new, json.decode, and the basic require to properly inject your path. be sure your path is set in launch settings. example paths are provided (and required for mw_runner to work).

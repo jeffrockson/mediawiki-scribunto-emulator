@@ -17,8 +17,12 @@ end
 package.path = table.concat({
     lua_lib_path .. "/?.lua",
     lua_lib_path .. "/ustring/?.lua",
+    module_path .. "/?.lua",
     package.path
 }, ";")
+
+-- Accommodate mediawiki's 5.1 lua environment that has unpack as a global instead of in the table library
+unpack = unpack or table.unpack
 
 -- Preload MediaWiki modules manually
 package.preload["mw"]        = function() return dofile(lua_lib_path .. "/mw.lua") end
@@ -55,16 +59,22 @@ end
 
 -- Override mw.title.new to work with local modules/subpages (simplified)
 local original_mw_title_new = mw.title and mw.title.new
-
 function mw.title.new(title)
-    if not title:match("^Module:") then
+    -- Delegate if not a Module: or Template: title
+    if not (title:match("^Module:") or title:match("^Template:")) then
         return original_mw_title_new and original_mw_title_new(title) or { exists = false, getContent = function() return nil end }
     end
 
-    local base = module_path .. "/" .. title:gsub("^Module:", "")
+    -- Determine base path
+    local base
+    if title:match("^Template:") then
+        base = mw_path .. "/templates/" .. title:gsub("^Template:", "")
+    else
+        base = module_path .. "/" .. title:gsub("^Module:", "")
+    end
 
-    -- If the title already has an extension (.json or .csv or .lua), use it directly
-    if base:match("%.[^/]+$") then
+    -- If an explicit or implicit extension is present, load directly
+    if base:match("%.[^/]+$") or base:match("_csv$") then
         local file = io.open(base, "r")
         if file then
             local content = file:read("*a")
@@ -72,7 +82,7 @@ function mw.title.new(title)
             return { exists = true, getContent = function() return content end }
         end
     else
-        -- No extension in title → try .lua only (per your rule)
+        -- Default to .lua extension for everything else (which will be modules or data tables)
         local luaPath = base .. ".lua"
         local file = io.open(luaPath, "r")
         if file then
@@ -84,6 +94,20 @@ function mw.title.new(title)
 
     -- Not found
     return { exists = false, getContent = function() return nil end }
+end
+
+-- Override loadData to do the same path-redirection as mw.title.new but return it as code instead of a string
+local original_loadData = mw.loadData
+function mw.loadData(title)
+    local page = mw.title.new(title)
+    if page.exists then
+        local chunk, err = load("return (function() " .. page:getContent() .. " end)()")
+        if chunk then
+            local ok, result = pcall(chunk)
+            if ok then return result end
+        end
+    end
+    return {}
 end
 
 -- Replace php.decodeJSON with this lua library
